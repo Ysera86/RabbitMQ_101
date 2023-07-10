@@ -18,15 +18,35 @@ channel.QueueDeclare("queue-name", true, false, false);
 // exclusive: false , subscriber bu kanal olmazsa da başka biyerden de erişebilsin farklı kanallardan 
 // autoDelete: true , son subscriber da down olsa kuyruk silinsin mi? yok gitmesin kuyruk
 
-string message = "Hello, World!";
+#region 1 er mesaj
 
-// mesajlar byte[] olarak gönderilir RabbitMQya
-var messageBody= Encoding.UTF8.GetBytes(message);
+//string message = "Hello, World!";
 
-channel.BasicPublish(string.Empty, "queue-name", null, messageBody);
-// biz burada exchange kullanmadan direk kuyruğa yolluyoruz mesajı, arada exchange kullanmadan direk publisherdan kuyruğa gönderirsek bu işlemin adı default exchange  olarak geçer.
-// default echange kullanıyorska buradaki routingkeyimize mutlaka kuyruk adımızı vermeliyiz > channel.QueueDeclare("queue-name", true, false, false);."queue-name" - ki buna göre gelen mesajı bu kuyruğa gönderebilsin.
+//// mesajlar byte[] olarak gönderilir RabbitMQya
+//var messageBody = Encoding.UTF8.GetBytes(message);
 
-Console.WriteLine("Mesaj gönderilmiştir.");
+//channel.BasicPublish(string.Empty, "queue-name", null, messageBody);
+//// biz burada exchange kullanmadan direk kuyruğa yolluyoruz mesajı, arada exchange kullanmadan direk publisherdan kuyruğa gönderirsek bu işlemin adı default exchange  olarak geçer.
+//// default echange kullanıyorska buradaki routingkeyimize mutlaka kuyruk adımızı vermeliyiz > channel.QueueDeclare("queue-name", true, false, false);."queue-name" - ki buna göre gelen mesajı bu kuyruğa gönderebilsin. 
+//Console.WriteLine("Mesaj gönderilmiştir.");
+
+#endregion
+
+#region 50 mesaj 
+
+Enumerable.Range(1, 50).ToList().ForEach(x =>
+{
+    string message = $"Message {x}";
+
+    var messageBody = Encoding.UTF8.GetBytes(message);
+
+    channel.BasicPublish(string.Empty, "queue-name", null, messageBody);
+
+    Console.WriteLine($"Mesaj gönderilmiştir : {message}");
+
+});
+
+#endregion
+
 
 Console.ReadLine();

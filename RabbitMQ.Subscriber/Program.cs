@@ -2,6 +2,15 @@
 using RabbitMQ.Client.Events;
 using System.Text;
 
+
+/*
+ Önemli :  Diyelim 2 subscriber var, kaç mesaj yollanabilir belirleyeiliyoruz.
+ya subs1 e 1, subs2ye 1 ya da 5er desek subs1e 5 subs2ye 5. 
+Eğer mesjaalrın işlenmesi uzun sürüyosa ve 7 mesaj varsa 5er 5er yollarken, subs2 2 taneyi işlediğinde subs1 hala 3 tane daha işlemeli, subs2 onun tirmesini bekler. Bu nedenle kaçar mesay alabileceğini/ yollanabileceğini seçerken buna dikkat etmek gerek.
+Mesaj işlemek uzun sürüyosa azar azar, kısa sürüyosa çok sayıda yollanması uygun olabilir!
+ 
+ */
+
 var factory = new ConnectionFactory();
 factory.Port = 5672;
 factory.HostName = "localhost";
