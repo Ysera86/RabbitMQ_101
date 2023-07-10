@@ -27,17 +27,39 @@ var channel = connection.CreateModel();
 // zaten varsa kuyruk burada da olması hata vermez. Sadece aynı isimde kuyruk oluşturuyosak tamamen aynı parametrelerle oluşturduğumuzdan  emin olmalıyız.
 
 
+channel.BasicQos(0, 1, false); // her subscribera 1er mesaj yolla
+/*
+ 2 tane subscriber instance çalıştırmak için cli ile bsubscriber proje dizinine gidip clidan çalıştırıcam, 2 ayrı cli mesela 
+şuan publisher 50 mesaj yolladı, kuyrkta bekliyorlar, aşırı hızlı alıyor mesajları tek taraf bu nedenle 1,5 sn bekletelim : Thread.Sleep(1500);
+
+cd C:\Users\merve\source\repos\RabbitMQ\RabbitMQ.Subscriber 
+dotnet run
+ 
+ */
+
+#region Açıklaması 
+//channel.BasicQos(0, 6, false); // Kuyruktaki her subscribera 6şar mesaj yolla
+//channel.BasicQos(0, 6, true);  // Bütün subscriberlara yolladığın mesajların toplamı 6 olsun, mesela 2 taneyse 3 e 3 gibi aralarında böle, 6 tanyse 1erli, 3 taneyse 2şerli gibi. 
+#endregion
+
 var consumer = new EventingBasicConsumer(channel);
-channel.BasicConsume("queue-name", true, consumer);
+//channel.BasicConsume("queue-name", true, consumer);
 /* autoAck : true > RabbitMQ subscribera bi mesaj gönderdiğinde, bu mesaj doğru da işlense yanlış da işlense RabbitMQ bu mesajı kuyruktan siler
  autoAck : false ise sen bunu direk silme, mesaj doğru işlenirse ben sana silmen için haber vericem demiş oluyoruz. > gerçek dünyada */
 
 
+channel.BasicConsume("queue-name", false, consumer); // mesajları hemen silme ben haber vericem doğr uişlendiğinde o zaman sil
+
 consumer.Received += (sender, args) =>
 {
     var message = Encoding.UTF8.GetString(args.Body.ToArray());
-
+    
+    Thread.Sleep(1500);
     Console.WriteLine($"Gelen mesaj : {message}");
+
+    channel.BasicAck(args.DeliveryTag, false); // hata varsa bunu sölemicez, RabbitMQ da işlendi mesajı aımayan mesajları 
+    // true : memorydeki her işlenen ama rabbitMqya gönderilmeyen mesajları sil .
+    // false :  mesajları teker teker işlediğim için teker teker sil diyorum
 
 };
 
